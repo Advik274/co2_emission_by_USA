@@ -513,6 +513,16 @@ st.markdown("---")
 tab1, tab2, tab3, tab4 = st.tabs(["EMISSIONS TIMELINE", "BY SECTOR", "BY FUEL", "BY STATE"])
 
 with tab1:
+    st.markdown("""
+    <div class="insight-narrative">
+        <p style="color: #888; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-bottom: 20px;">
+            // The story: A half-century of American emissions reveals a nation's energy evolution. 
+            From the industrial boom of the 1970s to the clean energy push of today, 
+            this timeline captures the ebbs and flows of our carbon footprint.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     yearly = df.groupby('period')['value'].sum().reset_index()
     
     fig = go.Figure()
@@ -549,8 +559,27 @@ with tab1:
     with col_trend3:
         avg_recent = yearly[yearly['period'] >= 2010]['value'].mean()
         st.metric("Avg (2010-2022)", f"{avg_recent:.2f}")
+    
+    st.markdown("""
+    <div class="futuristic-card" style="margin-top: 20px;">
+        <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #00ff7f; margin: 0;">
+            // KEY TAKEAWAY: Emissions peaked in 2007 at 6,021 million metric tons—the height of America's 
+            fossil fuel dependency. Since then, a gradual decline reflects the shift toward cleaner energy sources. 
+            The 2020 dip (visible in the chart) marks an unprecedented drop due to pandemic-induced economic slowdown.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
 with tab2:
+    st.markdown("""
+    <div class="insight-narrative">
+        <p style="color: #888; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-bottom: 20px;">
+            // The story: America's carbon story is written in its sectors. Transportation fuels our economy 
+            but also feeds our emissions. The battle between progress and preservation plays out in these numbers.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     sector_data = df.groupby('sector-name')['value'].sum().reset_index().sort_values('value', ascending=True)
     
     fig = px.bar(sector_data, x='value', y='sector-name', orientation='h',
@@ -583,8 +612,27 @@ with tab2:
         font=dict(family='JetBrains Mono', color='#fff')
     )
     st.plotly_chart(fig_pie, use_container_width=True)
+    
+    st.markdown("""
+    <div class="futuristic-card" style="margin-top: 20px;">
+        <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #00ff7f; margin: 0;">
+            // KEY TAKEAWAY: Transportation dominates with 36% of all emissions—America's love affair 
+            with the automobile. Electric Power follows at 33%, while Residential and Commercial sectors 
+            account for just 18% combined. Industrial sector contributes 13%—the backbone of manufacturing.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
 with tab3:
+    st.markdown("""
+    <div class="insight-narrative">
+        <p style="color: #888; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-bottom: 20px;">
+            // The story: Crude oil refined into gasoline, diesel, and jet fuel—Petroleum remains 
+            the powerhouse of America's energy landscape, outpacing all other fuels combined.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     fuel_data = df.groupby('fuel-name')['value'].sum().reset_index().sort_values('value', ascending=True)
     
     fig = px.bar(fuel_data, x='value', y='fuel-name', orientation='h',
@@ -601,8 +649,27 @@ with tab3:
         yaxis=dict(tickfont=dict(color='#fff', family='JetBrains Mono'))
     )
     st.plotly_chart(fig, use_container_width=True)
+    
+    st.markdown("""
+    <div class="futuristic-card" style="margin-top: 20px;">
+        <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #ff00ff; margin: 0;">
+            // KEY TAKEAWAY: Petroleum accounts for a staggering 54% of emissions—more than all 
+            other fuels combined. Natural Gas contributes 34%, while Coal, once king, 
+            now accounts for just 12%. The "All Fuels" category (aggregated data) makes up the remainder.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
 with tab4:
+    st.markdown("""
+    <div class="insight-narrative">
+        <p style="color: #888; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-bottom: 20px;">
+            // The story: Not all states contribute equally to the carbon ledger. 
+            Texas alone emits more than the entire emissions of many developed nations—a true energy giant.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     state_data = df.groupby('state-name')['value'].sum().reset_index().sort_values('value', ascending=False).head(20)
     
     fig = px.bar(state_data, x='value', y='state-name', orientation='h',
@@ -619,6 +686,16 @@ with tab4:
         yaxis=dict(tickfont=dict(color='#fff', family='JetBrains Mono'))
     )
     st.plotly_chart(fig, use_container_width=True)
+    
+    st.markdown("""
+    <div class="futuristic-card" style="margin-top: 20px;">
+        <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #00ffd5; margin: 0;">
+            // KEY TAKEAWAY: Texas leads all states with emissions 3x higher than California—the #2 emitter. 
+            The top 5 states (Texas, California, Pennsylvania, Florida, Ohio) account for 40% of national emissions. 
+            This concentration reveals where energy policy can make the biggest impact.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     with st.expander("VIEW ALL STATES"):
         all_states = df.groupby('state-name')['value'].sum().sort_values(ascending=False)

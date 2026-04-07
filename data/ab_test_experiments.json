@@ -100,13 +100,31 @@
         "metadata": {
           "variant": "B"
         }
+      },
+      {
+        "timestamp": "2026-04-08T02:32:29.505925",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:32:44.249301",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
       }
     ],
     "variants": {
       "B": {
-        "total": 10,
+        "total": 12,
         "events": {
-          "page_view": 8,
+          "page_view": 10,
           "generate_click": 2
         }
       }
