@@ -4,7 +4,6 @@ import numpy as np
 import plotly.graph_objects as go
 import os
 import sys
-from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.ab_testing import ab_testing
@@ -13,31 +12,117 @@ st.set_page_config(page_title="Analytics & Insights", page_icon="📈", layout="
 
 st.markdown("""
 <style>
-    .stApp { background-color: #0e1117; }
-    h1, h2, h3 { color: #00d4aa !important; }
-    .stat-card {
-        background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%);
-        padding: 20px;
-        border-radius: 12px;
-        border: 1px solid #00d4aa33;
-        text-align: center;
-    }
-    .insight-box {
-        background: #1a1a2e;
-        padding: 15px;
-        border-radius: 10px;
-        border-left: 4px solid #00d4aa;
-        margin: 10px 0;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary: #00ffd5;
+    --secondary: #ff00aa;
+    --bg-dark: #050508;
+}
+
+.stApp {
+    background: linear-gradient(180deg, #050508 0%, #0a0a15 50%, #050508 100%) !important;
+    font-family: 'Rajdhani', sans-serif !important;
+    color: #ffffff !important;
+}
+
+.bg-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: 
+        linear-gradient(rgba(0, 255, 213, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 213, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridScroll 30s linear infinite;
+}
+
+@keyframes gridScroll {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(60px, 60px); }
+}
+
+h1, h2, h3 {
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: 3px !important;
+    text-transform: uppercase !important;
+    background: linear-gradient(90deg, #00ffd5, #00b8a9, #00ffd5);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+    to { background-position: 200% center; }
+}
+
+h1 { font-size: 2rem !important; }
+
+.futuristic-card {
+    background: linear-gradient(135deg, rgba(20, 20, 35, 0.9) 0%, rgba(10, 10, 20, 0.95) 100%) !important;
+    border: 1px solid rgba(0, 255, 213, 0.2) !important;
+    border-radius: 20px !important;
+    padding: 25px !important;
+    transition: all 0.3s ease !important;
+}
+
+.futuristic-card:hover {
+    border-color: #00ffd5 !important;
+    box-shadow: 0 10px 40px rgba(0, 255, 213, 0.15) !important;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(0, 255, 213, 0.1) 0%, rgba(15, 15, 25, 0.95) 100%) !important;
+    border: 1px solid rgba(0, 255, 213, 0.3) !important;
+    border-radius: 15px !important;
+    padding: 25px !important;
+    text-align: center;
+}
+
+.stat-value {
+    font-family: 'Orbitron', sans-serif !important;
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    background: linear-gradient(135deg, #00ffd5, #00b8a9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.5) !important;
+    font-size: 0.8rem !important;
+    letter-spacing: 2px !important;
+}
+
+.insight-box {
+    background: linear-gradient(135deg, rgba(0,255,213,0.1) 0%, rgba(15,15,25,0.95) 100%);
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 3px solid #00ffd5;
+    margin: 10px 0;
+}
 </style>
+
+<div class="bg-grid"></div>
 """, unsafe_allow_html=True)
 
-st.title("📈 Analytics & Insights")
-st.markdown("A/B test results, user feedback analysis, and usage statistics")
+st.markdown("""
+<div style="text-align: center; padding: 40px 20px 30px;">
+    <h1>Analytics & Insights</h1>
+    <p style="color: rgba(255,255,255,0.4); font-size: 1rem; letter-spacing: 4px; margin-top: 10px;">
+        A/B TEST RESULTS & USAGE STATISTICS
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
-st.markdown("### 🔬 A/B Test Results")
+st.markdown("### A/B TEST RESULTS")
 
 stats = ab_testing.get_experiment_stats('prediction_ui')
 
@@ -55,34 +140,34 @@ if stats and stats.get('events'):
     with col1:
         st.markdown(f"""
         <div class="stat-card">
-            <h3 style="color:#fff; margin:0;">{total_events}</h3>
-            <p style="color:#888; margin:0;">Total Events</p>
+            <p class="stat-value">{total_events}</p>
+            <p class="stat-label">TOTAL EVENTS</p>
         </div>
         """, unsafe_allow_html=True)
     
     with col2:
         st.markdown(f"""
         <div class="stat-card">
-            <h3 style="color:#fff; margin:0;">{unique_users}</h3>
-            <p style="color:#888; margin:0;">Unique Users</p>
+            <p class="stat-value">{unique_users}</p>
+            <p class="stat-label">UNIQUE USERS</p>
         </div>
         """, unsafe_allow_html=True)
     
     with col3:
-        variant_a_count = variant_counts.get('A', 0)
+        variant_a = variant_counts.get('A', 0)
         st.markdown(f"""
         <div class="stat-card">
-            <h3 style="color:#4ecdc4; margin:0;">{variant_a_count}</h3>
-            <p style="color:#888; margin:0;">Variant A (Classic)</p>
+            <p class="stat-value" style="background: linear-gradient(135deg, #4ecdc4, #45b7aa); -webkit-background-clip: text;">{variant_a}</p>
+            <p class="stat-label">VARIANT A</p>
         </div>
         """, unsafe_allow_html=True)
     
     with col4:
-        variant_b_count = variant_counts.get('B', 0)
+        variant_b = variant_counts.get('B', 0)
         st.markdown(f"""
         <div class="stat-card">
-            <h3 style="color:#ff6b6b; margin:0;">{variant_b_count}</h3>
-            <p style="color:#888; margin:0;">Variant B (Modern)</p>
+            <p class="stat-value" style="background: linear-gradient(135deg, #ff00aa, #ff6b9d); -webkit-background-clip: text;">{variant_b}</p>
+            <p class="stat-label">VARIANT B</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -97,13 +182,13 @@ if stats and stats.get('events'):
             event_types[e] = event_types.get(e, 0) + 1
         
         fig_events = go.Figure(data=[
-            go.Pie(labels=list(event_types.keys()), values=list(event_types.values()),
-                   hole=0.4, marker_colors=['#00d4aa', '#4ecdc4', '#ff6b6b', '#ffa502'])
+            go.Pie(labels=list(event_types.keys()), values=list(event_types.keys()),
+                   hole=0.5, marker_colors=['#00ffd5', '#4ecdc4', '#ff00aa', '#ffa502'])
         ])
         fig_events.update_layout(
-            title='Event Distribution',
+            title=dict(text='EVENT DISTRIBUTION', font=dict(family='Orbitron', size=14, color='#00ffd5'), x=0.5),
             paper_bgcolor='rgba(0,0,0,0)',
-            font_color='#fff'
+            font=dict(family='Rajdhani', color='#fff')
         )
         st.plotly_chart(fig_events, use_container_width=True)
     
@@ -124,22 +209,22 @@ if stats and stats.get('events'):
                 name=f'Variant {variant}',
                 x=events,
                 y=values,
-                marker_color='#00d4aa' if variant == 'A' else '#ff6b6b'
+                marker_color='#00ffd5' if variant == 'A' else '#ff00aa'
             ))
         
         fig_compare.update_layout(
-            title='Events by Variant',
+            title=dict(text='EVENTS BY VARIANT', font=dict(family='Orbitron', size=14, color='#00ffd5'), x=0.5),
             barmode='group',
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            font_color='#fff',
-            legend=dict(bgcolor='rgba(0,0,0,0)')
+            font=dict(family='Rajdhani', color='#fff'),
+            legend=dict(bgcolor='rgba(0,0,0,0)', font=dict(color='#fff'))
         )
         st.plotly_chart(fig_compare, use_container_width=True)
     
     st.markdown("---")
     
-    st.markdown("### 📊 Conversion Funnel")
+    st.markdown("### CONVERSION FUNNEL")
     
     funnel_data = {}
     for event in stats['events']:
@@ -150,21 +235,21 @@ if stats and stats.get('events'):
         funnel_data[v][e] = funnel_data[v].get(e, 0) + 1
     
     for variant in ['A', 'B']:
-        st.markdown(f"#### Variant {variant}")
+        st.markdown(f"**Variant {variant}**")
         if variant in funnel_data:
             for event_name, count in sorted(funnel_data[variant].items(), key=lambda x: x[1], reverse=True):
-                percentage = (count / len([e for e in stats['events'] if e.get('variant') == variant])) * 100
                 st.markdown(f"""
                 <div class="insight-box">
-                    <strong>{event_name}</strong>: {count} ({percentage:.1f}%)
+                    <strong>{event_name}</strong>: {count}
                 </div>
                 """, unsafe_allow_html=True)
-        st.markdown("---")
     
 else:
-    st.info("No A/B test data collected yet. The tracking code is ready and will collect data as users interact with the predictions page.")
+    st.info("No A/B test data yet. Tracking is ready!")
 
-st.markdown("### 💬 User Feedback Analysis")
+st.markdown("---")
+
+st.markdown("### USER FEEDBACK")
 
 feedback = ab_testing.get_feedback_stats()
 
@@ -179,15 +264,13 @@ if feedback:
         
         fig_fb = go.Figure(data=[
             go.Bar(x=list(feedback_types.keys()), y=list(feedback_types.values()),
-                   marker_color='#00d4aa')
+                   marker_color='#00ffd5')
         ])
         fig_fb.update_layout(
-            title='Feedback Distribution',
-            xaxis_title='Feedback Type',
-            yaxis_title='Count',
+            title=dict(text='FEEDBACK DISTRIBUTION', font=dict(family='Orbitron', size=14, color='#00ffd5'), x=0.5),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            font_color='#fff'
+            font=dict(family='Rajdhani', color='#fff')
         )
         st.plotly_chart(fig_fb, use_container_width=True)
     
@@ -199,79 +282,52 @@ if feedback:
         sentiment_data = go.Figure(data=[
             go.Pie(labels=['Positive', 'Negative', 'Neutral'], 
                    values=[positive, negative, neutral],
-                   hole=0.4,
-                   marker_colors=['#00d4aa', '#ff6b6b', '#ffa502'])
+                   hole=0.5,
+                   marker_colors=['#00ffd5', '#ff00aa', '#ffa502'])
         ])
         sentiment_data.update_layout(
-            title='Sentiment Analysis',
+            title=dict(text='SENTIMENT ANALYSIS', font=dict(family='Orbitron', size=14, color='#00ffd5'), x=0.5),
             paper_bgcolor='rgba(0,0,0,0)',
-            font_color='#fff'
+            font=dict(family='Rajdhani', color='#fff')
         )
         st.plotly_chart(sentiment_data, use_container_width=True)
     
-    st.markdown("### 📝 Recent Comments")
-    
-    comments = [f for f in feedback if f.get('comment')]
-    if comments:
-        for comment in comments[-10:]:
-            st.markdown(f"""
-            <div class="insight-box">
-                <strong>{comment.get('user_id', 'Anonymous')}</strong> 
-                <span style="color:#888;">({comment.get('timestamp', '')})</span>
-                <p>{comment.get('comment', '')}</p>
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.info("No comments yet.")
-    
-    with st.expander("View All Feedback"):
+    with st.expander("VIEW ALL FEEDBACK"):
         feedback_df = pd.DataFrame(feedback)
         st.dataframe(feedback_df, use_container_width=True)
         
         csv = feedback_df.to_csv(index=False)
-        st.download_button("Download Feedback CSV", csv, "feedback.csv", "text/csv")
+        st.download_button("DOWNLOAD CSV", csv, "feedback.csv", "text/csv")
 
 else:
-    st.info("No user feedback collected yet.")
+    st.info("No feedback yet.")
 
 st.markdown("---")
 
-st.markdown("### 🚀 Usage Insights")
+st.markdown("### TRACKED EVENTS")
 
 st.markdown("""
-<div class="insight-box">
-    <strong>Key Metrics to Track:</strong>
-    <ul>
-        <li>Prediction generation rate (generations per session)</li>
-        <li>Model preference distribution</li>
-        <li>State/sector/fuel combination popularity</li>
-        <li>Feedback rate (users who provide feedback)</li>
-        <li>Variant conversion (page_view → generate_click → prediction_made)</li>
-    </ul>
+<div class="futuristic-card">
+    <table style="width: 100%; color: #fff; font-family: 'Rajdhani', sans-serif;">
+        <tr style="border-bottom: 1px solid rgba(0,255,213,0.2);">
+            <td style="padding: 12px; color: #00ffd5;">page_view</td>
+            <td style="padding: 12px; color: #888;">User visits prediction page</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0,255,213,0.2);">
+            <td style="padding: 12px; color: #00ffd5;">generate_click</td>
+            <td style="padding: 12px; color: #888;">User clicks prediction button</td>
+        </tr>
+        <tr style="border-bottom: 1px solid rgba(0,255,213,0.2);">
+            <td style="padding: 12px; color: #00ffd5;">prediction_made</td>
+            <td style="padding: 12px; color: #888;">Prediction successfully generated</td>
+        </tr>
+        <tr>
+            <td style="padding: 12px; color: #00ffd5;">feedback</td>
+            <td style="padding: 12px; color: #888;">User provides feedback</td>
+        </tr>
+    </table>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("### ⚙️ A/B Test Configuration")
-
-col_test1, col_test2 = st.columns(2)
-
-with col_test1:
-    st.markdown("""
-    **Current Experiment: prediction_ui**
-    - **Variant A**: Classic prediction display (box with gradient)
-    - **Variant B**: Modern metrics display (Streamlit metrics + progress)
-    - **Traffic Split**: 50/50
-    """)
-
-with col_test2:
-    st.markdown("""
-    **Tracked Events:**
-    - `page_view`: User visits prediction page
-    - `generate_click`: User clicks prediction button
-    - `prediction_made`: Prediction successfully generated
-    - `feedback`: User provides feedback on prediction
-    - `error`: Prediction generation fails
-    """)
-
 st.markdown("---")
-st.markdown("*Analytics data is stored locally in `data/ab_test_experiments.json` and `data/user_feedback.json`*")
+st.caption("Data stored locally in data/ab_test_experiments.json")

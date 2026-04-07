@@ -1,0 +1,56 @@
+{
+  "prediction_ui": {
+    "events": [
+      {
+        "timestamp": "2026-04-08T02:09:49.800800",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:11:08.043297",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:11:14.098466",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:11:14.519861",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Commercial carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2025,
+          "model": "Random Forest"
+        }
+      }
+    ],
+    "variants": {
+      "B": {
+        "total": 4,
+        "events": {
+          "page_view": 3,
+          "generate_click": 1
+        }
+      }
+    }
+  }
+}
