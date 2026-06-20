@@ -6,6 +6,9 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import importlib
+if 'src.ab_testing' in sys.modules:
+    importlib.reload(sys.modules['src.ab_testing'])
 from src.ab_testing import ab_testing
 from streamlit_app.components import inject_theme, page_header, metric_card, insight_card, section_divider
 
@@ -15,8 +18,7 @@ inject_theme()
 page_header("Analytics & Insights", "A/B TESTING RESULTS")
 
 try:
-    ab = ab_testing()
-    ab_results = ab.get_results()
+    ab_results = ab_testing.get_results()
 except Exception as e:
     st.error(f"Error loading A/B testing data: {e}")
     st.stop()

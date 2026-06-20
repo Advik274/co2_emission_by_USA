@@ -8,6 +8,9 @@ import joblib
 import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import importlib
+if 'src.ab_testing' in sys.modules:
+    importlib.reload(sys.modules['src.ab_testing'])
 from src import utils
 from src.ab_testing import ab_testing
 
@@ -313,7 +316,7 @@ with col2:
                                 change_rate = -0.02 * last_val
                             
                             tf = 1.0 + (change_rate / last_val * 0.7)
-                            tf = max(0.5, min(1.1, tf)
+                            tf = max(0.5, min(1.1, tf))
                             
                             pred = float(last_val)
                             for yr_idx in range(yrs_diff):

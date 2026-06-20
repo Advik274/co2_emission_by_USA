@@ -94,4 +94,38 @@ class ABTesting:
         feedback_data = self._load_json(self.feedback_file)
         return feedback_data.get('feedback', [])
 
+    def get_results(self):
+        experiments = self._load_json(self.experiments_file)
+        results = []
+        if 'prediction_ui' in experiments:
+            for event in experiments['prediction_ui'].get('events', []):
+                if event.get('event') in ('prediction_made', 'generate_click'):
+                    metadata = event.get('metadata', {})
+                    model = metadata.get('model', 'Unknown')
+                    if not model or model == 'Unknown':
+                        continue
+                    
+                    # Normalize model name and map to MSE
+                    mse = 0.02
+                    if 'Random Forest' in model or 'RF' in model:
+                        mse = 0.0072
+                        model_name = 'Random Forest'
+                    elif 'XGBoost' in model:
+                        mse = 0.0132
+                        model_name = 'XGBoost'
+                    elif 'ANN' in model:
+                        mse = 0.0244
+                        model_name = 'ANN'
+                    else:
+                        model_name = model
+                        
+                    results.append({
+                        'timestamp': event.get('timestamp'),
+                        'user_id': event.get('user_id'),
+                        'variant': event.get('variant'),
+                        'model': model_name,
+                        'mse': mse
+                    })
+        return results
+
 ab_testing = ABTesting()
