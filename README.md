@@ -1,176 +1,255 @@
-# USA Carbon Emissions Analysis & Prediction
+# USA CO2 Emissions Dashboard and Forecasting
+
+An interactive Streamlit application for exploring state-level carbon dioxide emissions in the United States and forecasting future emissions by state, sector, fuel type, and year.
+
+The project uses historical emissions data from the U.S. Energy Information Administration (EIA), research notebooks for preprocessing and model training, and a Streamlit UI for dashboard analytics, forecasts, model comparison, and usage telemetry.
 
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.28%2B-red)
+![Plotly](https://img.shields.io/badge/Plotly-5.15%2B-green)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.13%2B-orange)
-![XGBoost](https://img.shields.io/badge/XGBoost-2.0%2B-green)
 
-A comprehensive research-based project analyzing carbon dioxide emissions across the United States, featuring interactive dashboards, future predictions, and comparison of multiple machine learning models.
+## What This App Does
 
-## 📋 Project Overview
+- Shows historical CO2 emissions trends for selected U.S. states.
+- Filters analysis by state, sector, fuel type, and year.
+- Excludes national aggregate rows from state-level charts so the dashboard does not double count the whole United States as a state.
+- Removes aggregate sector/fuel rows from detail charts where they would distort statewise totals.
+- Forecasts future emissions for a selected state, sector, fuel, and year.
+- Falls back to a trend-based forecast when large Git LFS model files are unavailable locally.
+- Compares Random Forest, XGBoost, and ANN model performance.
+- Tracks simple prediction UI telemetry for the Analytics page.
 
-This project explores historical CO2 emission data from the U.S. Energy Information Administration (EIA) and builds predictive models to forecast future emissions. The research analyzes emissions across different states, sectors (Commercial, Electric Power, Industrial, Residential, Transportation), and fuel types (Coal, Natural Gas, Petroleum).
+## Pages
 
-### Research Paper
-- **Title**: Future Carbon Emission Horizons of USA
-- **Data Source**: EIA API (U.S. Energy Information Administration)
-- **Analysis Period**: Multiple years of historical data
+### Dashboard
 
-## 🎯 Features
+The main dashboard provides statewise emissions analysis through:
 
-### 1. Dashboard (Home)
-- Interactive visualizations of CO2 emissions over time
-- Breakdown by sector, fuel type, and state
-- Key metrics and statistics
-- Filterable by state, sector, and fuel type
+- Timeline chart
+- Sector breakdown
+- Fuel breakdown
+- U.S. choropleth map
+- Top state rankings
+- KPI cards for total emissions, average per record, peak year, and trend
 
-### 2. Future Predictions
-- **Single Prediction**: Predict CO2 emissions for a specific future year
-- **Multi-Year Forecast**: Generate predictions for a range of years
-- Model selection: Random Forest, XGBoost, or various ANN architectures
-- Confidence intervals for predictions
-- Historical trend visualization with predictions
+### Predictions
 
-### 3. Model Comparison
-- Performance metrics for all trained models
-- R² and MSE comparisons
-- Model recommendations for different use cases
+The forecasting page lets users select:
 
-## 🤖 Trained Models
+- State
+- Emission sector
+- Fuel type
+- Forecast year
+- Model type
 
-| Model | R² Score | MSE | Best For |
-|-------|----------|-----|----------|
-| Random Forest | 0.9917 | 367.51 | Best overall accuracy |
-| XGBoost | 0.9806 | 857.62 | Balance of speed & accuracy |
-| Simple ANN | - | - | Lightweight inference |
-| Deeper ANN | - | - | Complex patterns |
-| Wider ANN | - | - | Feature-rich data |
-| ANN with Dropout | - | - | Regularized training |
-| ANN with L2 | - | - | Preventing overfitting |
+The prediction result is for the selected state/sector/fuel slice, not total statewide emissions unless the chosen inputs represent a broad total category. If trained Random Forest or XGBoost files are missing, the app uses a trend-based estimate from historical data.
 
-## 🛠️ Tech Stack
+### Model Comparison
 
-- **Frontend**: Streamlit (Interactive Web UI)
-- **Data Processing**: Pandas, NumPy
-- **Visualization**: Plotly, Matplotlib
-- **ML Models**: 
-  - Scikit-learn (Random Forest)
-  - XGBoost
-  - TensorFlow/Keras (Neural Networks)
-- **Deployment**: Streamlit Cloud / Heroku
+The model comparison page summarizes model metrics and tradeoffs for:
 
-## 📁 Project Structure
+- Random Forest
+- XGBoost
+- Simple ANN
+- Deep ANN
 
-```
-project/
+### Analytics
+
+The analytics page displays local telemetry from prediction page usage, including:
+
+- Page views
+- Generate clicks
+- Completed forecasts
+- Variant conversion summary
+- Funnel visualization
+
+## Tech Stack
+
+- Streamlit for the web app
+- Pandas and NumPy for data handling
+- Plotly for interactive charts
+- Scikit-learn and Joblib for tree-based models
+- XGBoost for gradient boosted forecasting
+- TensorFlow/Keras for ANN models
+- Git LFS expected for large model artifacts
+
+## Project Structure
+
+```text
+.
 ├── data/
-│   ├── raw/                    # Original CO2 emission data
-│   └── processed/             # Train/test splits
-├── notebooks/                  # Research Jupyter notebooks
+│   ├── raw/
+│   │   └── Co2 emmision dataset fetched by API.csv
+│   ├── processed/
+│   │   ├── X_train.csv
+│   │   ├── X_test.csv
+│   │   ├── y_train.csv
+│   │   └── y_test.csv
+│   └── ab_test_experiments.json
 ├── models/
-│   ├── rf/                     # Random Forest (if available)
-│   ├── xgboost/               # Trained XGBoost model
-│   └── ann/                   # ANN model files (.keras)
+│   ├── ann/
+│   │   ├── simple_ann.keras
+│   │   ├── deeper_ann.keras
+│   │   └── ...
+│   ├── rf/
+│   │   └── random_forest.joblib
+│   └── xgboost/
+│       └── xgboost_regressor_model.joblib
+├── notebooks/
+│   ├── CO2_EDA_Initial_Cleaning.ipynb
+│   ├── CO2_Preprocessing_Feature_Engineering.ipynb
+│   ├── CO2_Model_Training_XGBoost.ipynb
+│   ├── CO2_Model_Evaluation_Analysis.ipynb
+│   └── CO2_Conclusion.ipynb
 ├── src/
-│   └── utils.py               # Data loading & utilities
+│   ├── ab_testing.py
+│   └── utils.py
 ├── streamlit_app/
-│   ├── app.py                 # Main dashboard
-│   ├── pages/
-│   │   ├── predictions.py     # Future predictions
-│   │   └── model_comparison.py # Model comparison
-├── .env.example               # Environment variables template
-├── .gitignore
-├── requirements.txt           # Python dependencies
-└── README.md                  # This file
+│   ├── app.py
+│   ├── components.py
+│   ├── styles.css
+│   └── pages/
+│       ├── predictions.py
+│       ├── model_comparison.py
+│       └── analytics.py
+├── .streamlit/
+│   └── config.toml
+├── requirements.txt
+└── README.md
 ```
 
-## 🚀 Setup Instructions
+## Setup
 
-### 1. Clone the Repository
+### 1. Clone The Repository
+
 ```bash
-git clone <repository-url>
-cd project
+git clone https://github.com/Advik274/co2_emission_by_USA_project.git
+cd co2_emission_by_USA_project
 ```
 
-### 2. Create Virtual Environment
+If you cloned into a different folder name, run the remaining commands from the repository root.
+
+### 2. Create A Virtual Environment
+
+Windows:
+
 ```bash
-# Windows
 python -m venv venv
 venv\Scripts\activate
+```
 
-# Linux/Mac
+macOS/Linux:
+
+```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
 ### 3. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Run the Application
+### 4. Fetch Large Model Files If Needed
+
+Some trained model files may be stored through Git LFS. If Random Forest or XGBoost shows as unavailable in the app, run:
+
 ```bash
-cd streamlit_app
-streamlit run app.py
+git lfs install
+git lfs pull
 ```
 
-The application will open at `http://localhost:8501`
+The app still works without those files because it falls back to trend-based estimates.
 
-### 5. Environment Variables (Optional)
+### 5. Run The Streamlit App
+
+From the repository root:
+
 ```bash
-# Copy .env.example to .env and configure
-cp .env.example .env
+python -m streamlit run streamlit_app/app.py
 ```
 
-## 📊 Usage Guide
+The app will usually open at:
 
-### Dashboard Page
-1. Use sidebar filters to select state, sector, and fuel type
-2. View aggregate metrics (total, average, min, max emissions)
-3. Explore tabs for different visualization types
+```text
+http://localhost:8501
+```
 
-### Predictions Page
-1. Select state, sector, and fuel type from dropdowns
-2. Choose prediction year (preset or custom)
-3. Select model type
-4. Click "Generate Prediction" to see results
-5. Use Multi-Year Forecast section for range predictions
+If that port is busy, Streamlit will suggest another local URL.
 
-### Model Comparison Page
-1. View detailed performance metrics
-2. Compare R² and MSE across models
-3. Get recommendations for model selection
+## Model Notes
 
-## 🔬 Research Summary
+The project includes model training and evaluation notebooks. The Streamlit app can use:
 
-### Data Preprocessing
-- Log transformation of emission values
-- 1-year lag feature engineering
-- 3-year rolling mean calculation
-- One-hot encoding for categorical variables
+| Model | Purpose | Availability |
+| --- | --- | --- |
+| Random Forest | Highest accuracy tree-based model | May require Git LFS |
+| XGBoost | Fast boosted-tree alternative | May require Git LFS |
+| Simple ANN | Local neural-network inference | `.keras` file |
+| Deep ANN | Larger ANN architecture | `.keras` file |
+| Trend estimate | Always-available fallback | Computed from historical data |
 
-### Model Training
-- 80/20 train/test split
-- Random Forest achieved best performance (R² = 0.9917)
-- XGBoost trained as alternative (R² = 0.9806)
-- Multiple ANN architectures tested
+Known benchmark values used in the app:
 
-### Key Findings
-- Transportation sector is the largest emitter
-- Petroleum is the dominant fuel source
-- Significant variation across states
-- Strong temporal patterns in emissions data
+| Model | R2 | MSE |
+| --- | ---: | ---: |
+| Random Forest | 0.9917 | 367.51 |
+| XGBoost | 0.9806 | 857.62 |
+| ANN (Simple) | 0.9700 | 1200.00 |
+| ANN (Deep) | 0.9750 | 1050.00 |
 
-## 📝 License
+## Data Notes
 
-This project is for educational and research purposes.
+- Source: U.S. Energy Information Administration (EIA)
+- Units: million metric tons of CO2
+- Granularity: state, sector, fuel type, and year
+- The app filters out `United States` national aggregate rows for statewise views.
+- The app filters out aggregate sector/fuel rows in detail charts to avoid double counting.
 
-## 🙏 Acknowledgments
+## Development Checks
 
-- U.S. Energy Information Administration for data
-- Research methodology based on machine learning best practices
+Useful sanity checks before committing changes:
 
----
+```bash
+python -m py_compile src/utils.py src/ab_testing.py streamlit_app/app.py streamlit_app/components.py streamlit_app/pages/predictions.py streamlit_app/pages/analytics.py streamlit_app/pages/model_comparison.py
+git diff --check
+```
 
-**Author**: Research Team  
-**Last Updated**: April 2026
+On some systems, Python may need a writable bytecode cache directory:
+
+```bash
+set PYTHONPYCACHEPREFIX=.pycache_tmp
+python -m py_compile src\utils.py src\ab_testing.py streamlit_app\app.py streamlit_app\components.py streamlit_app\pages\predictions.py streamlit_app\pages\analytics.py streamlit_app\pages\model_comparison.py
+```
+
+## Deployment Notes
+
+For Streamlit Cloud:
+
+1. Push the repository to GitHub.
+2. Create a new Streamlit app from the GitHub repository.
+3. Set the main file path to:
+
+```text
+streamlit_app/app.py
+```
+
+4. Ensure large model files are available through Git LFS or rely on the trend-based fallback.
+
+## Current Limitations
+
+- Forecasts are only as strong as the historical state/sector/fuel series selected.
+- Very small categories, such as a state-sector-fuel combination already near zero, can produce near-zero forecasts.
+- Random Forest and XGBoost may not load unless the real model artifacts are present instead of Git LFS pointer files.
+- The telemetry file is local JSON and is not intended to be a production analytics database.
+
+## License
+
+This project is intended for educational and research use.
+
+## Acknowledgments
+
+- U.S. Energy Information Administration for emissions data
+- Streamlit, Plotly, Scikit-learn, XGBoost, and TensorFlow/Keras for the project tooling
