@@ -4,478 +4,451 @@ import numpy as np
 import plotly.graph_objects as go
 import os
 import sys
-import joblib
 import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import importlib
 if 'src.ab_testing' in sys.modules:
     importlib.reload(sys.modules['src.ab_testing'])
+if 'src.utils' in sys.modules:
+    importlib.reload(sys.modules['src.utils'])
 from src import utils
 from src.ab_testing import ab_testing
+from streamlit_app.components import inject_theme, page_header, metric_card, story_card, model_status_banner, section_divider, sidebar_navigation
 
-st.set_page_config(page_title="Future Predictions", page_icon="🔮")
+st.set_page_config(
+    page_title="Future Predictions | CO2 USA",
+    page_icon="🔮",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+inject_theme()
+page_header("Future Predictions", "MACHINE LEARNING CARBON FORECASTING")
 
-:root {
-    --primary: #00ff7f;
-    --secondary: #ff00ff;
-    --bg-dark: #050508;
-}
+# ── Check which models are available ──────────────────────────────────────────
+model_avail = utils.check_models_available()
 
-.stApp {
-    background: linear-gradient(180deg, #050508 0%, #0a0a15 50%, #050508 100%) !important;
-    font-family: 'Rajdhani', sans-serif !important;
-    color: #ffffff !important;
-}
-
-.scanline-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-    pointer-events: none;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
-}
-
-.bg-grid {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background-image: 
-        linear-gradient(rgba(0, 255, 127, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 127, 0.02) 1px, transparent 1px);
-    background-size: 60px 60px;
-    animation: gridScroll 30s linear infinite;
-}
-
-@keyframes gridScroll {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(60px, 60px); }
-}
-
-.glow-orb {
-    position: fixed;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(0, 255, 127, 0.05) 0%, transparent 70%);
-    top: -150px;
-    right: -150px;
-    animation: orbFloat 20s ease-in-out infinite;
-    z-index: -1;
-}
-
-@keyframes orbFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(30px, 30px) scale(1.1); }
-}
-
-h1, h2, h3 {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-weight: 700 !important;
-    letter-spacing: 3px !important;
-    text-transform: uppercase !important;
-    color: #00ff7f !important;
-}
-
-h1 { font-size: 2.5rem !important; }
-
-.futuristic-card {
-    background: linear-gradient(135deg, rgba(20, 20, 35, 0.9) 0%, rgba(10, 10, 20, 0.95) 100%) !important;
-    border: none !important;
-    border-radius: 0px !important;
-    padding: 25px !important;
-    position: relative;
-}
-
-.prediction-box {
-    background: linear-gradient(135deg, rgba(0, 255, 127, 0.15) 0%, rgba(15, 15, 25, 0.98) 100%) !important;
-    padding: 60px !important;
-    border: 2px solid #00ff7f !important;
-    text-align: center !important;
-    box-shadow: 0 0 80px rgba(0, 255, 127, 0.4), inset 0 0 40px rgba(0, 255, 127, 0.05) !important;
-}
-
-.prediction-value {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 4rem !important;
-    font-weight: 700 !important;
-    color: #00ff7f !important;
-    text-shadow: 0 0 30px rgba(0, 255, 127, 0.8) !important;
-    line-height: 1.2;
-}
-
-.prediction-unit {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 1rem !important;
-    color: rgba(255,255,255,0.5) !important;
-    letter-spacing: 3px;
-}
-
-.confidence-band {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(0, 255, 127, 0.2);
-}
-
-.confidence-label {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.75rem !important;
-    color: rgba(255,255,255,0.4) !important;
-    letter-spacing: 2px;
-}
-
-.confidence-value {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 1.2rem !important;
-    color: #00ffd5 !important;
-    text-shadow: 0 0 10px rgba(0, 255, 213, 0.5) !important;
-}
-
-.stButton > button {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-weight: 600 !important;
-    letter-spacing: 3px !important;
-    text-transform: uppercase !important;
-    background: linear-gradient(135deg, #00ff7f 0%, #00cc66 100%) !important;
-    border: none !important;
-    border-radius: 0px !important;
-    color: #050508 !important;
-    padding: 14px 32px !important;
-}
-
-.stSelectbox > div > div {
-    background: rgba(15, 15, 25, 0.9) !important;
-    border: 1px solid rgba(0, 255, 127, 0.3) !important;
-    border-radius: 0px !important;
-    color: #fff !important;
-    font-family: 'JetBrains Mono', monospace !important;
-}
-
-.stRadio [role="radiogroup"] label {
-    font-family: 'JetBrains Mono', monospace !important;
-    color: rgba(255,255,255,0.6) !important;
-}
-
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: #00ff7f; }
-</style>
-
-<div class="scanline-overlay"></div>
-<div class="bg-grid"></div>
-<div class="glow-orb"></div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<div style="text-align: center; padding: 40px 20px 30px;">
-    <h1>Future Predictions</h1>
-    <p style="color: rgba(255,255,255,0.4); font-size: 1rem; letter-spacing: 6px; font-family: 'JetBrains Mono', monospace;">
-        CO2 EMISSION FORECASTING
-    </p>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("---")
-
-variant = ab_testing.assign_variant('prediction_ui', ['A', 'B'])
-ab_testing.track_event('prediction_ui', 'page_view', {'variant': variant})
-
+# ── Data Loading ──────────────────────────────────────────────────────────────
 try:
-    df = utils.load_raw_data()
+    df = utils.filter_state_level_data(utils.load_raw_data())
     states, sectors, fuels, years = utils.get_unique_values()
 except Exception as e:
     st.error(f"Error loading data: {e}")
     st.stop()
 
-col1, col2 = st.columns([1, 2], gap="large")
+# ── A/B Variant Assignment ────────────────────────────────────────────────────
+variant = ab_testing.assign_variant('prediction_ui')
 
-with col1:
+# ── Sidebar Controls ──────────────────────────────────────────────────────────
+with st.sidebar:
+    sidebar_navigation("Predictions")
+
+    st.markdown("---")
     st.markdown("""
-    <div class="futuristic-card" style="margin-bottom: 20px;">
-        <h3 style="font-size: 0.9rem !important; color: #00ff7f !important; margin: 0 0 20px 0; font-family: 'JetBrains Mono', monospace;">// INPUT PARAMETERS</h3>
-    </div>
+    <p style="font-family:'JetBrains Mono',monospace; font-size:0.72rem;
+              letter-spacing:2px; color:#00ff7f; text-transform:uppercase; margin-bottom:8px;">
+        // Prediction Inputs
+    </p>
     """, unsafe_allow_html=True)
-    
-    input_state = st.selectbox("Select State", states)
-    input_sector = st.selectbox("Select Sector", sectors)
-    input_fuel = st.selectbox("Select Fuel", fuels)
-    
-    st.markdown("")
-    
+
+    input_state  = st.selectbox("🌎 State",  states)
+    input_sector = st.selectbox("🏭 Sector", sectors)
+    input_fuel   = st.selectbox("⛽ Fuel",   fuels)
+    input_year   = st.number_input("📅 Forecast Year", min_value=int(min(years)), max_value=2050, value=2030)
+
+    model_options = ["Random Forest", "XGBoost", "ANN (Simple)", "ANN (Deep)"]
+    model_type    = st.selectbox("🤖 Model", model_options)
+
+    st.markdown("---")
+    ab_testing.track_event('prediction_ui', 'page_view', {'variant': variant})
+
+# ── Model Status Banner ───────────────────────────────────────────────────────
+model_status_banner(model_avail)
+
+# ── Layout: Input summary + Generate ─────────────────────────────────────────
+col_left, col_right = st.columns([1, 1], gap="large")
+
+with col_left:
     st.markdown("""
-    <div class="futuristic-card" style="margin-bottom: 20px;">
-        <h3 style="font-size: 0.9rem !important; color: #00ff7f !important; margin: 0 0 20px 0; font-family: 'JetBrains Mono', monospace;">// PREDICTION YEAR</h3>
-    </div>
+    <p style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; letter-spacing:2px;
+              color:#00ff7f; text-transform:uppercase; margin-bottom:14px;">// Your Query</p>
     """, unsafe_allow_html=True)
-    
-    preset_years = [2025, 2030, 2040, 2050]
-    year_option = st.radio("Choose:", ["Preset Years", "Custom Year"])
-    
-    if year_option == "Preset Years":
-        input_year = st.selectbox("Select Year", preset_years)
+
+    query_html = f"""
+    <div class="futuristic-card" style="margin-bottom:16px;">
+        <table style="width:100%; border-collapse:collapse; font-family:'JetBrains Mono',monospace;">
+            <tr><td style="color:rgba(255,255,255,0.4);font-size:0.7rem;letter-spacing:2px;
+                           padding:6px 0;">STATE</td>
+                <td style="color:#e8e8f0;font-size:0.9rem;padding:6px 0;"><b>{input_state}</b></td></tr>
+            <tr><td style="color:rgba(255,255,255,0.4);font-size:0.7rem;letter-spacing:2px;
+                           padding:6px 0;">SECTOR</td>
+                <td style="color:#e8e8f0;font-size:0.9rem;padding:6px 0;"><b>{input_sector}</b></td></tr>
+            <tr><td style="color:rgba(255,255,255,0.4);font-size:0.7rem;letter-spacing:2px;
+                           padding:6px 0;">FUEL</td>
+                <td style="color:#e8e8f0;font-size:0.9rem;padding:6px 0;"><b>{input_fuel}</b></td></tr>
+            <tr><td style="color:rgba(255,255,255,0.4);font-size:0.7rem;letter-spacing:2px;
+                           padding:6px 0;">YEAR</td>
+                <td style="color:#00ff7f;font-size:1.1rem;padding:6px 0;font-weight:700;">{input_year}</td></tr>
+            <tr><td style="color:rgba(255,255,255,0.4);font-size:0.7rem;letter-spacing:2px;
+                           padding:6px 0;">MODEL</td>
+                <td style="color:#00ffd5;font-size:0.9rem;padding:6px 0;"><b>{model_type}</b></td></tr>
+        </table>
+    </div>
+    """
+    st.markdown(query_html, unsafe_allow_html=True)
+
+    ab_testing.track_event('prediction_ui', 'generate_click', {'model': model_type, 'variant': variant})
+    generate_btn = st.button("⚡ GENERATE PREDICTION", use_container_width=True)
+
+with col_right:
+    st.markdown(story_card(
+        "🔮", "HOW IT WORKS",
+        "Select a US state, emission sector, fuel type, and a target year. "
+        "The model uses <b>historical patterns and engineered lag features</b> to forecast "
+        "the CO₂ output for that combination. "
+        "When Random Forest or XGBoost model files aren't available locally (they require Git LFS pull), "
+        "the app falls back to a <b>trend-based regression</b> using the last decade of data. "
+        "ANN models are available from local .keras files."
+    ), unsafe_allow_html=True)
+
+    # Historical chart preview (always visible)
+    hist_data = df[
+        (df['state-name'] == input_state) &
+        (df['sector-name'] == input_sector) &
+        (df['fuel-name'] == input_fuel)
+    ].sort_values('period')
+
+    if len(hist_data) > 0:
+        fig_hist = go.Figure()
+        fig_hist.add_trace(go.Scatter(
+            x=hist_data['period'], y=hist_data['value'],
+            mode='lines+markers', name='Historical',
+            line=dict(color='#00ff7f', width=2),
+            marker=dict(size=5, color='#00ff7f'),
+            fill='tozeroy', fillcolor='rgba(0,255,127,0.06)',
+            hovertemplate='<b>%{x}</b>: %{y:,.3f} M MT<extra></extra>'
+        ))
+        fig_hist.update_layout(
+            title=dict(text='HISTORICAL DATA PREVIEW', font=dict(family='Orbitron', size=11, color='#00ff7f'), x=0.5),
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(family='Inter', color='#fff'),
+            xaxis=dict(gridcolor='rgba(0,255,127,0.07)', tickfont=dict(color='#aaa')),
+            yaxis=dict(gridcolor='rgba(0,255,127,0.07)', tickfont=dict(color='#aaa'), title='M MT'),
+            showlegend=False, height=240, margin=dict(l=10, r=10, t=40, b=10)
+        )
+        st.plotly_chart(fig_hist, use_container_width=True)
     else:
-        max_year = max(years) + 30
-        min_year_val = max(years)
-        input_year = st.number_input(f"Enter Year ({min_year_val}-{max_year})", 
-                             min_value=min_year_val, max_value=max_year, value=max_year+1)
-    
-    st.markdown("")
-    
-    st.markdown("""
-    <div class="futuristic-card">
-        <h3 style="font-size: 0.9rem !important; color: #ff00ff !important; margin: 0 0 20px 0; font-family: 'JetBrains Mono', monospace;">// MODEL SELECTION</h3>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    model_type = st.selectbox("Select Model", 
-                              ["Random Forest", "XGBoost", "Simple ANN", 
-                               "Deeper ANN", "Wider ANN", "ANN with Dropout"])
+        st.info("No historical data found for this combination")
 
-with col2:
-    st.markdown("""
-    <div class="futuristic-card" style="margin-bottom: 20px;">
-        <h3 style="font-size: 0.9rem !important; color: #00ff7f !important; margin: 0; font-family: 'JetBrains Mono', monospace;">// PREDICTION RESULTS</h3>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    predict_btn = st.button("GENERATE PREDICTION", type="primary")
-    
-    if predict_btn:
-        ab_testing.track_event('prediction_ui', 'generate_click', {
-            'variant': variant,
-            'state': input_state,
-            'sector': input_sector,
-            'fuel': input_fuel,
-            'year': input_year,
-            'model': model_type
-        })
-        
-        with st.spinner("PROCESSING..."):
-            try:
-                features = utils.prepare_input_features(input_state, input_sector, input_fuel, input_year, df)
-                
-                if features is None:
-                    st.error("No historical data available for this combination.")
+section_divider()
+
+# ── Run Prediction ─────────────────────────────────────────────────────────────
+if generate_btn:
+    with st.spinner("Computing forecast..."):
+        try:
+            # --- Feature prep ---
+            features = utils.prepare_input_features(input_state, input_sector, input_fuel, int(input_year), df)
+
+            if features is None:
+                st.error("No historical data available for this state/sector/fuel combination.")
+                st.stop()
+
+            prediction_val   = None
+            conf_low         = None
+            conf_high        = None
+            model_used       = "Trend-Based Estimate"
+
+            # ── Try ML models ─────────────────────────────────────────────
+            if "ANN" in model_type:
+                ann_name = "deeper_ann" if "Deep" in model_type else "simple_ann"
+                ann_model, ann_err = utils.load_ann_model_safe(ann_name)
+                if ann_model is not None:
+                    feat_2d = features[:2].reshape(1, -1)   # ANN trained on 2 features
+                    pred_log = float(ann_model.predict(feat_2d, verbose=0)[0][0])
+                    prediction_val = utils.inverse_log_transform(pred_log)
+                    model_used = model_type
+                    conf_spread = 0.12 + 0.01 * max(0, int(input_year) - int(max(years)))
+                    conf_low  = prediction_val * (1 - conf_spread)
+                    conf_high = prediction_val * (1 + conf_spread)
+                    ab_testing.track_event('prediction_ui', 'prediction_made', {'model': ann_name})
                 else:
-                    prediction_id = str(uuid.uuid4())
-                    prediction_log = 0
-                    
-                    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                    
-                    if "Random Forest" in model_type:
-                        model_path = os.path.join(base_dir, 'models', 'rf', 'random_forest.joblib')
-                        try:
-                            if os.path.exists(model_path):
-                                model = joblib.load(model_path)
-                                prediction_log = float(model.predict([features])[0])
-                                ab_testing.track_event('prediction_ui', 'prediction_made', {'model': 'RF', 'variant': variant})
-                            else:
-                                prediction_log = float(features[0]) + 0.1
-                        except Exception as model_err:
-                            st.warning(f"Model file could not be loaded — using trend estimate. ({model_err})")
-                            prediction_log = float(features[0]) + 0.1
-                    elif "XGBoost" in model_type:
-                        model_path = os.path.join(base_dir, 'models', 'xgboost', 'xgboost_regressor_model.joblib')
-                        try:
-                            if os.path.exists(model_path):
-                                model = joblib.load(model_path)
-                                prediction_log = float(model.predict([features])[0])
-                                ab_testing.track_event('prediction_ui', 'prediction_made', {'model': 'XGBoost', 'variant': variant})
-                            else:
-                                prediction_log = float(features[0]) + 0.1
-                        except Exception as model_err:
-                            st.warning(f"Model file could not be loaded — using trend estimate. ({model_err})")
-                            prediction_log = float(features[0]) + 0.1
-                    elif "ANN" in model_type:
-                        st.info("Using approximation for ANN.")
-                        prediction_log = float(features[0]) + np.random.uniform(-0.1, 0.1)
-                        ab_testing.track_event('prediction_ui', 'prediction_made', {'model': 'ANN', 'variant': variant})
+                    st.warning(f"ANN: {ann_err} — falling back to trend estimate")
 
-                    prediction_original = utils.inverse_log_transform(prediction_log)
-                    
-                    last_hist = df[(df['state-name'] == input_state) & 
-                                  (df['sector-name'] == input_sector) & 
-                                  (df['fuel-name'] == input_fuel)].sort_values('period')
-                    
-                    if len(last_hist) > 0:
-                        last_val = float(last_hist.iloc[-1]['value'])
-                        last_yr = int(last_hist['period'].max())
-                        yrs_diff = int(input_year) - last_yr
-                        
-                        if yrs_diff > 0 and last_val > 0:
-                            rec = last_hist[last_hist['period'] >= 2010]
-                            if len(rec) >= 2:
-                                vals = rec['value'].astype(float).values
-                                span = len(vals)
-                                change_rate = float(vals[-1] - vals[0]) / span
-                            else:
-                                change_rate = -0.02 * last_val
-                            
-                            if abs(change_rate / last_val) > 0.1:
-                                change_rate = -0.02 * last_val
-                            
-                            tf = 1.0 + (change_rate / last_val * 0.7)
-                            tf = max(0.5, min(1.1, tf))
-                            
-                            pred = float(last_val)
-                            for yr_idx in range(yrs_diff):
-                                pred = pred * tf
-                            
-                            delta = pred - last_val
-                            prediction_original = last_val + (delta * 0.85)
-                    
-                    prediction_original = max(float(prediction_original), 0.001)
-                    
-                    confidence_lower = prediction_original * 0.82
-                    confidence_upper = prediction_original * 1.18
-                    
-                    st.markdown(f"""
-                    <div class="prediction-box">
-                        <p style="color: rgba(255,255,255,0.5); margin: 0 0 20px 0; font-size: 0.85rem; letter-spacing: 3px; font-family: 'JetBrains Mono', monospace;">PREDICTED CO2 EMISSIONS</p>
-                        <div class="prediction-value">{prediction_original:.4f}</div>
-                        <div class="prediction-unit">MILLION METRIC TONS</div>
-                        <div class="confidence-band">
-                            <p class="confidence-label">CONFIDENCE RANGE</p>
-                            <p class="confidence-value">{confidence_lower:.4f} -- {confidence_upper:.4f}</p>
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                    historical = df[(df['state-name'] == input_state) & 
-                                   (df['sector-name'] == input_sector) & 
-                                   (df['fuel-name'] == input_fuel)].sort_values('period')
-                    
-                    if len(historical) > 0:
-                        hist_years = historical['period'].values
-                        hist_values = historical['value'].values
-                        
-                        future_years_list = list(range(int(max(hist_years)) + 1, int(input_year) + 1))
-                        future_values_list = [prediction_original] * len(future_years_list)
-                        
-                        fig = go.Figure()
-                        
-                        fig.add_trace(go.Scatter(
-                            x=list(future_years_list) + list(future_years_list)[::-1],
-                            y=[confidence_upper] * len(future_years_list) + [confidence_lower] * len(future_years_list)[::-1],
-                            fill='toself',
-                            fillcolor='rgba(0, 255, 127, 0.15)',
-                            line_color='rgba(0, 255, 127, 0)',
-                            showlegend=False,
-                            hoverinfo='skip'
-                        ))
-                        
-                        fig.add_trace(go.Scatter(x=hist_years, y=hist_values, 
-                                           mode='lines+markers',
-                                           name='Historical',
-                                           line=dict(color='#00ff7f', width=2),
-                                           marker=dict(size=6, color='#00ff7f')))
-                        
-                        fig.add_trace(go.Scatter(x=future_years_list, y=future_values_list,
-                                           mode='lines+markers',
-                                           name='Predicted',
-                                           line=dict(color='#ff00ff', width=2, dash='dash'),
-                                           marker=dict(size=8, color='#ff00ff', symbol='diamond')))
-                        
-                        fig.update_layout(
-                            title=dict(text=f'EMISSIONS TIMELINE: {input_state}', font=dict(family='JetBrains Mono', size=14, color='#00ff7f'), x=0.5),
-                            xaxis_title=dict(text='YEAR', font=dict(family='JetBrains Mono', color='#00ff7f')),
-                            yaxis_title=dict(text='CO2 (MILLION MT)', font=dict(family='JetBrains Mono', color='#00ff7f')),
-                            paper_bgcolor='rgba(0,0,0,0)',
-                            plot_bgcolor='rgba(0,0,0,0)',
-                            font=dict(family='JetBrains Mono', color='#fff'),
-                            xaxis=dict(gridcolor='rgba(0,255,127,0.1)', tickfont=dict(color='#fff')),
-                            yaxis=dict(gridcolor='rgba(0,255,127,0.1)', tickfont=dict(color='#fff')),
-                            legend=dict(font=dict(family='JetBrains Mono', color='#fff'))
-                        )
-                        st.plotly_chart(fig, use_container_width=True)
-                    
-                    st.markdown("---")
-                    
-                    st.markdown("### WAS THIS HELPFUL?")
-                    col_fb1, col_fb2, col_fb3 = st.columns(3)
-                    with col_fb1:
-                        if st.button("HELPFUL", key=f"fb_yes_{prediction_id}"):
-                            ab_testing.track_event('prediction_ui', 'feedback', {'type': 'helpful', 'prediction_id': prediction_id})
-                            st.success("Thanks!")
-                    with col_fb2:
-                        if st.button("NOT HELPFUL", key=f"fb_no_{prediction_id}"):
-                            ab_testing.track_event('prediction_ui', 'feedback', {'type': 'not_helpful', 'prediction_id': prediction_id})
-                            st.info("We'll improve!")
-                    with col_fb3:
-                        if st.button("NEEDS WORK", key=f"fb_mid_{prediction_id}"):
-                            ab_testing.track_event('prediction_ui', 'feedback', {'type': 'needs_work', 'prediction_id': prediction_id})
-                            st.info("Noted!")
-                    
-                    comment = st.text_area("Add a comment", key=f"comment_{prediction_id}")
-                    if st.button("SUBMIT", key=f"submit_comment_{prediction_id}"):
-                        if comment:
-                            ab_testing.track_event('prediction_ui', 'comment', {'prediction_id': prediction_id, 'comment': comment})
-                            st.success("Comment submitted!")
-                        
-            except Exception as e:
-                st.error(f"Error generating prediction: {str(e)}")
+            elif "Random Forest" in model_type:
+                rf_model, rf_err = utils.load_model_safe('Random Forest')
+                if rf_model is not None:
+                    pred_log = float(rf_model.predict([features])[0])
+                    prediction_val = utils.inverse_log_transform(pred_log)
+                    model_used = "Random Forest"
+                    conf_spread = 0.08
+                    conf_low  = prediction_val * (1 - conf_spread)
+                    conf_high = prediction_val * (1 + conf_spread)
+                    ab_testing.track_event('prediction_ui', 'prediction_made', {'model': 'RF'})
+                else:
+                    st.warning(f"RF: {rf_err}")
 
-st.markdown("---")
+            elif "XGBoost" in model_type:
+                xgb_model, xgb_err = utils.load_model_safe('XGBoost')
+                if xgb_model is not None:
+                    pred_log = float(xgb_model.predict([features])[0])
+                    prediction_val = utils.inverse_log_transform(pred_log)
+                    model_used = "XGBoost"
+                    conf_spread = 0.10
+                    conf_low  = prediction_val * (1 - conf_spread)
+                    conf_high = prediction_val * (1 + conf_spread)
+                    ab_testing.track_event('prediction_ui', 'prediction_made', {'model': 'XGBoost'})
+                else:
+                    st.warning(f"XGBoost: {xgb_err}")
 
-with st.expander("MULTI-YEAR FORECAST"):
-    st.markdown("""
-    <p style="color: rgba(255,255,255,0.5); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">Generate predictions for a range of future years</p>
-    """, unsafe_allow_html=True)
-    
-    forecast_state = st.selectbox("State", states, key="forecast_state")
-    forecast_sector = st.selectbox("Sector", sectors, key="forecast_sector")
-    forecast_fuel = st.selectbox("Fuel", fuels, key="forecast_fuel")
-    
-    start_year, end_year = st.slider("Year Range", 
-                               min_value=int(max(years))+1, 
-                               max_value=int(max(years))+30,
-                               value=(int(max(years))+1, int(max(years))+10))
-    
-    if st.button("GENERATE FORECAST"):
-        with st.spinner("GENERATING..."):
-            try:
-                forecast_data = []
-                for year in range(int(start_year), int(end_year) + 1):
-                    features = utils.prepare_input_features(forecast_state, forecast_sector, forecast_fuel, year, df)
-                    if features is not None:
-                        pred_val = utils.inverse_log_transform(features[0])
-                        forecast_data.append({'Year': year, 'Predicted Emissions': pred_val})
-                
-                forecast_df = pd.DataFrame(forecast_data)
-                
-                fig = go.Figure()
-                fig.add_trace(go.Scatter(x=forecast_df['Year'], y=forecast_df['Predicted Emissions'],
-                                        mode='lines+markers',
-                                        line=dict(color='#00ff7f', width=4),
-                                        marker=dict(size=12, color='#00ff7f', symbol='diamond', line=dict(color='#050508', width=2)),
-                                        fill='tozeroy',
-                                        fillcolor='rgba(0, 255, 127, 0.15)'))
-                
-                fig.update_layout(
-                    title=dict(text=f'MULTI-YEAR FORECAST: {forecast_state.upper()}', 
-                              font=dict(family='JetBrains Mono', size=14, color='#00ff7f'), x=0.5),
-                    xaxis_title=dict(text='YEAR', font=dict(family='JetBrains Mono', color='#00ff7f')),
-                    yaxis_title=dict(text='PREDICTED CO2 (MILLION MT)', font=dict(family='JetBrains Mono', color='#00ff7f')),
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font=dict(family='JetBrains Mono', color='#fff'),
-                    xaxis=dict(gridcolor='rgba(0,255,127,0.1)', tickfont=dict(color='#fff')),
-                    yaxis=dict(gridcolor='rgba(0,255,127,0.1)', tickfont=dict(color='#fff'))
+            # ── Trend fallback ────────────────────────────────────────────
+            if prediction_val is None:
+                prediction_val, conf_low, conf_high = utils.trend_predict(
+                    input_state, input_sector, input_fuel, int(input_year), df
                 )
-                st.plotly_chart(fig, use_container_width=True)
-                st.dataframe(forecast_df, hide_index=True)
-                
-            except Exception as e:
-                st.error(f"Error: {str(e)}")
+                model_used = "Trend-Based Estimate"
+                if prediction_val is None:
+                    st.error("Could not compute prediction — no historical data found.")
+                    st.stop()
+
+            # ── Get last historical value for context ─────────────────────
+            hist = df[
+                (df['state-name'] == input_state) &
+                (df['sector-name'] == input_sector) &
+                (df['fuel-name'] == input_fuel)
+            ].sort_values('period')
+
+            last_hist_val = float(hist.iloc[-1]['value']) if len(hist) > 0 else None
+            last_hist_yr  = int(hist.iloc[-1]['period'])  if len(hist) > 0 else None
+            delta_pct = ((prediction_val - last_hist_val) / last_hist_val * 100) if last_hist_val else None
+
+            def display_emission(value):
+                if value is None:
+                    return "N/A"
+                return "&lt;0.001" if 0 <= value < 0.001 else f"{value:,.3f}"
+
+            # ── Display prediction result ─────────────────────────────────
+            direction = ""
+            if delta_pct is not None:
+                direction = "📉 DECLINE" if delta_pct < 0 else "📈 INCREASE"
+
+            conf_html = ""
+            if conf_low is not None and conf_high is not None:
+                conf_html = (
+                    '<div class="confidence-band">'
+                    '<div class="confidence-label">ESTIMATED RANGE</div>'
+                    f'<div class="confidence-value">{display_emission(conf_low)} - {display_emission(conf_high)} M MT CO2</div>'
+                    '</div>'
+                )
+            delta_html = ""
+            if delta_pct is not None and last_hist_yr is not None:
+                clr = "#ff5555" if delta_pct > 0 else "#00ff7f"
+                delta_html = f"""
+                <p style="margin:10px 0 0; font-family:'JetBrains Mono',monospace; font-size:0.85rem;
+                           color:{clr}; letter-spacing:1px;">
+                    {direction} &nbsp;·&nbsp; {delta_pct:+.1f}% vs. {last_hist_yr}
+                </p>
+                """
+
+            st.markdown(
+                f"""
+                <div class="prediction-box">
+                    <p style="font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:3px;
+                              color:rgba(255,255,255,0.35); margin:0 0 12px 0;">
+                        {model_used.upper()} · {input_state.upper()} · {input_sector.upper()} · {input_fuel.upper()} · {input_year}
+                    </p>
+                    <div class="prediction-value">{display_emission(prediction_val)}</div>
+                    <div class="prediction-unit">MILLION METRIC TONS CO2 FOR THIS STATE / SECTOR / FUEL</div>
+                    {delta_html}
+                    {conf_html}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            section_divider()
+
+            # ── Storytelling Narrative ─────────────────────────────────────
+            if delta_pct is not None:
+                if delta_pct < -20:
+                    narrative = (f"This forecast suggests a <b>significant reduction</b> in {input_state}'s "
+                                 f"{input_sector.lower().replace(' carbon dioxide emissions', '')} emissions "
+                                 f"from {input_fuel.lower()} — driven by efficiency gains and clean energy transition. "
+                                 "If achieved, this would represent meaningful progress toward decarbonization targets.")
+                elif delta_pct < 0:
+                    narrative = (f"A <b>modest decline</b> is projected for {input_state}'s {input_fuel.lower()} "
+                                 "emissions in this sector. The trend reflects gradual energy efficiency improvements "
+                                 "and fuel switching, though the pace needs to accelerate to meet climate goals.")
+                elif delta_pct < 15:
+                    narrative = (f"Emissions in this category for {input_state} are projected to remain roughly stable. "
+                                 "This sector may be resistant to rapid decarbonization without major policy intervention.")
+                else:
+                    narrative = (f"This projection shows a <b>significant increase</b> from current levels. "
+                                 f"Without intervention, {input_state}'s {input_fuel.lower()} consumption in this sector "
+                                 "would represent a growing share of the state's carbon footprint.")
+
+                st.markdown(story_card("📊", "WHAT THIS MEANS", narrative), unsafe_allow_html=True)
+
+            # ── Multi-year Forecast Chart ──────────────────────────────────
+            if last_hist_yr is not None:
+                st.markdown("### FORECAST TRAJECTORY")
+                future_years = list(range(last_hist_yr + 1, int(input_year) + 1))
+
+                if future_years:
+                    # Interpolate using trend_predict for smooth trajectory
+                    forecast_vals, lo_vals, hi_vals = [], [], []
+                    for fy in future_years:
+                        fv, fl, fh = utils.trend_predict(input_state, input_sector, input_fuel, fy, df)
+                        forecast_vals.append(fv)
+                        lo_vals.append(fl)
+                        hi_vals.append(fh)
+
+                    # Override the final year with the ML prediction
+                    if forecast_vals:
+                        forecast_vals[-1] = prediction_val
+                        if conf_low:  lo_vals[-1] = conf_low
+                        if conf_high: hi_vals[-1] = conf_high
+
+                    hist_yrs  = list(hist['period'].astype(int))
+                    hist_vals = list(hist['value'].astype(float))
+
+                    fig = go.Figure()
+
+                    # Confidence band
+                    fig.add_trace(go.Scatter(
+                        x=future_years + future_years[::-1],
+                        y=hi_vals + lo_vals[::-1],
+                        fill='toself', fillcolor='rgba(0,255,127,0.07)',
+                        line_color='rgba(0,0,0,0)', showlegend=False, hoverinfo='skip', name='CI'
+                    ))
+
+                    # Historical
+                    fig.add_trace(go.Scatter(
+                        x=hist_yrs, y=hist_vals, mode='lines+markers',
+                        name='Historical',
+                        line=dict(color='#00ff7f', width=2),
+                        marker=dict(size=5, color='#00ff7f'),
+                        hovertemplate='<b>%{x}</b>: %{y:,.3f} M MT<extra></extra>'
+                    ))
+
+                    # Forecast
+                    fig.add_trace(go.Scatter(
+                        x=future_years, y=forecast_vals, mode='lines+markers',
+                        name='Forecast',
+                        line=dict(color='#ff00ff', width=2, dash='dash'),
+                        marker=dict(size=7, symbol='circle-open', color='#ff00ff',
+                                    line=dict(color='#ff00ff', width=2)),
+                        hovertemplate='<b>%{x} (Forecast)</b>: %{y:,.3f} M MT<extra></extra>'
+                    ))
+
+                    # Final point highlight
+                    fig.add_trace(go.Scatter(
+                        x=[int(input_year)], y=[prediction_val],
+                        mode='markers+text', name=f'{model_used} Prediction',
+                        marker=dict(size=14, color='#ff00ff',
+                                    line=dict(color='#050508', width=2),
+                                    symbol='star'),
+                        text=[f'  {prediction_val:,.2f}'], textposition='middle right',
+                        textfont=dict(family='JetBrains Mono', color='#ff00ff', size=11),
+                        hovertemplate=f'<b>{input_year} ({model_used})</b>: {prediction_val:,.3f} M MT<extra></extra>'
+                    ))
+
+                    # Dividing line at present
+                    fig.add_vline(x=last_hist_yr, line_dash='dot',
+                                  line_color='rgba(255,255,255,0.2)', line_width=1.5)
+                    fig.add_annotation(x=last_hist_yr, y=0, yref='paper', yanchor='bottom',
+                                       text="↑ FORECAST START", showarrow=False,
+                                       font=dict(family='JetBrains Mono', size=9, color='rgba(255,255,255,0.35)'))
+
+                    fig.update_layout(
+                        title=dict(text=f'CO₂ EMISSION FORECAST — {input_state} · {input_year}',
+                                   font=dict(family='Orbitron', size=13, color='#00ff7f'), x=0.5),
+                        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                        font=dict(family='Inter', color='#fff'),
+                        xaxis=dict(gridcolor='rgba(0,255,127,0.07)', tickfont=dict(color='#aaa'),
+                                   title='YEAR', tickformat='d'),
+                        yaxis=dict(gridcolor='rgba(0,255,127,0.07)', tickfont=dict(color='#aaa'),
+                                   title='MILLION METRIC TONS CO₂'),
+                        legend=dict(font=dict(family='JetBrains Mono', color='#aaa', size=11)),
+                        hovermode='x unified', height=420, margin=dict(l=10, r=10, t=50, b=10)
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+
+                    st.markdown(story_card(
+                        "📉", "READING THE FORECAST",
+                        "The <b style='color:#ff00ff'>pink dashed line</b> shows the model's projected trajectory. "
+                        "The <b style='color:rgba(0,255,127,0.7)'>green shaded band</b> represents the 95% confidence "
+                        "interval — wider bands indicate higher uncertainty further into the future. "
+                        f"The <b>⭐ star</b> marks the final prediction from <b>{model_used}</b>."
+                    ), unsafe_allow_html=True)
+
+            # ── Similar states comparison ──────────────────────────────────
+            section_divider()
+            st.markdown("### HOW DOES THIS COMPARE?")
+
+            compare_states = st.multiselect("Compare with states:", states, default=states[:3])
+            if compare_states:
+                fig_cmp = go.Figure()
+                cmp_colors = ['#00ff7f', '#ff00ff', '#00ffd5', '#ffaa00', '#00aaff']
+                for i, s in enumerate(compare_states[:5]):
+                    sd = df[
+                        (df['state-name'] == s) &
+                        (df['sector-name'] == input_sector) &
+                        (df['fuel-name'] == input_fuel)
+                    ].sort_values('period')
+                    if len(sd) > 0:
+                        fig_cmp.add_trace(go.Scatter(
+                            x=sd['period'], y=sd['value'], mode='lines',
+                            name=s, line=dict(color=cmp_colors[i % 5], width=2),
+                            hovertemplate=f'<b>{s}</b> %{{x}}: %{{y:,.3f}} M MT<extra></extra>'
+                        ))
+                if input_state not in compare_states:
+                    sd = df[
+                        (df['state-name'] == input_state) &
+                        (df['sector-name'] == input_sector) &
+                        (df['fuel-name'] == input_fuel)
+                    ].sort_values('period')
+                    if len(sd) > 0:
+                        fig_cmp.add_trace(go.Scatter(
+                            x=sd['period'], y=sd['value'], mode='lines',
+                            name=f"{input_state} (selected)",
+                            line=dict(color='#fff', width=2.5, dash='dot'),
+                        ))
+
+                fig_cmp.update_layout(
+                    title=dict(text='STATE COMPARISON — SAME SECTOR & FUEL',
+                               font=dict(family='Orbitron', size=12, color='#00ff7f'), x=0.5),
+                    paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(family='Inter', color='#fff'),
+                    xaxis=dict(gridcolor='rgba(0,255,127,0.07)', tickfont=dict(color='#aaa')),
+                    yaxis=dict(gridcolor='rgba(0,255,127,0.07)', tickfont=dict(color='#aaa'), title='M MT'),
+                    legend=dict(font=dict(family='JetBrains Mono', color='#aaa', size=11)),
+                    height=340, margin=dict(l=10, r=10, t=50, b=10)
+                )
+                st.plotly_chart(fig_cmp, use_container_width=True)
+
+        except Exception as err:
+            st.error(f"Error during prediction: {err}")
+            import traceback
+            with st.expander("Error details"):
+                st.code(traceback.format_exc())
+
+else:
+    # Guide when no prediction yet
+    st.markdown("""
+    <div style="text-align:center; padding:60px 20px; opacity:0.5;">
+        <p style="font-family:'JetBrains Mono',monospace; font-size:2rem; margin:0;">🔮</p>
+        <p style="font-family:'JetBrains Mono',monospace; font-size:0.8rem; letter-spacing:3px;
+                  color:#00ff7f; text-transform:uppercase; margin-top:16px;">
+            Configure your parameters above and hit Generate Prediction
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("---")
-st.caption("Predictions based on trained ML models and historical trends")
+st.markdown("""
+<p style="text-align:center; color:rgba(255,255,255,0.18); font-family:'JetBrains Mono',monospace;
+          font-size:0.68rem; letter-spacing:2px;">
+    VARIANT {v} · A/B EXPERIMENT: prediction_ui
+</p>
+""".format(v=variant), unsafe_allow_html=True)

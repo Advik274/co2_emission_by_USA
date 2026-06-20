@@ -1,0 +1,16 @@
+[runner]
+magicEnabled = true
+
+[server]
+enableCORS = true
+enableXsrfProtection = true
+
+[browser]
+serverAddress = "localhost"
+gatherUsageStats = false
+
+[theme]
+primaryColor = "#00ff7f"
+backgroundColor = "#050508"
+secondaryBackgroundColor = "#0a0a15"
+textColor = "#ffffff"

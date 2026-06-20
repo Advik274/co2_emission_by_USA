@@ -17,14 +17,14 @@ class ABTesting:
             default = {}
         if os.path.exists(filepath):
             try:
-                with open(filepath, 'r') as f:
+                with open(filepath, 'r', encoding='utf-8') as f:
                     return json.load(f)
             except:
                 return default
         return default
     
     def _save_json(self, filepath, data):
-        with open(filepath, 'w') as f:
+        with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2)
     
     def get_user_id(self):
