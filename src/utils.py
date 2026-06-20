@@ -80,9 +80,22 @@ def prepare_input_features(state, sector, fuel, year, historical_data):
         if len(row) > 0:
             return row.iloc[0][['value_log_transformed_lag1', 'value_log_transformed_roll_mean3']].values
     
-    last_values = state_data.iloc[-1]
-    lag1 = last_values['value_log_transformed']
+    last_year = state_data['period'].max()
+    last_log_value = state_data.iloc[-1]['value_log_transformed']
     roll_mean = state_data['value_log_transformed'].tail(3).mean()
+    
+    years_ahead = year - last_year
+    if years_ahead > 0:
+        recent_values = state_data['value_log_transformed'].tail(10)
+        if len(recent_values) >= 2:
+            trend = (recent_values.iloc[-1] - recent_values.iloc[0]) / len(recent_values)
+        else:
+            trend = -0.02
+        
+        projected_log_value = last_log_value + (trend * years_ahead * 0.8)
+        projected_log_value = max(projected_log_value, last_log_value * 0.5)
+    else:
+        projected_log_value = last_log_value
     
     sector_cols = get_feature_columns()[2:7]
     fuel_cols = get_feature_columns()[7:]
@@ -92,7 +105,7 @@ def prepare_input_features(state, sector, fuel, year, historical_data):
     fuel_features = [1.0 if fuel == f.replace('fuel-name_', '') else 0.0 
                     for f in fuel_cols]
     
-    features = np.array([lag1, roll_mean] + sector_features + fuel_features)
+    features = np.array([projected_log_value, roll_mean] + sector_features + fuel_features)
     return features
 
 def inverse_log_transform(value):

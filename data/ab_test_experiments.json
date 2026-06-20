@@ -118,14 +118,416 @@
         "metadata": {
           "variant": "B"
         }
+      },
+      {
+        "timestamp": "2026-04-08T02:35:42.287780",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:37:45.144430",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:37:48.926989",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:37:49.379315",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Commercial carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2025,
+          "model": "Random Forest \u2b50"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:04.764843",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:07.361280",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:07.794753",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Commercial carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2040,
+          "model": "Random Forest \u2b50"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:15.816806",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:17.510975",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:17.960764",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Commercial carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2050,
+          "model": "Random Forest \u2b50"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:21.919455",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:24.025533",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:24.452766",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Commercial carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2030,
+          "model": "Random Forest \u2b50"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:27.622880",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:32.993377",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:33.424240",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Commercial carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2025,
+          "model": "Random Forest \u2b50"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:38.435123",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:40.261152",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:40.709377",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Electric Power carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2025,
+          "model": "Random Forest \u2b50"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:48.298730",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:49.627529",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:50.054157",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Electric Power carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2050,
+          "model": "Random Forest \u2b50"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:51.527204",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:38:52.021163",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Electric Power carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2050,
+          "model": "Random Forest \u2b50"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:41:46.666143",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:42:12.668695",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:42:22.705920",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:42:23.134025",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Commercial carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2025,
+          "model": "Random Forest \u2b50"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:42:29.039698",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:42:30.942862",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:42:31.365087",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Commercial carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2030,
+          "model": "Random Forest \u2b50"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:42:34.760401",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:42:36.827130",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:42:38.976771",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:42:39.405701",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Commercial carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2050,
+          "model": "Random Forest \u2b50"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:46:42.513544",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:46:45.197913",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "page_view",
+        "metadata": {
+          "variant": "B"
+        }
+      },
+      {
+        "timestamp": "2026-04-08T02:46:45.649476",
+        "user_id": "cd3df675",
+        "variant": "B",
+        "event": "generate_click",
+        "metadata": {
+          "variant": "B",
+          "state": "Alabama",
+          "sector": "Commercial carbon dioxide emissions",
+          "fuel": "All Fuels",
+          "year": 2050,
+          "model": "Random Forest \u2b50"
+        }
       }
     ],
     "variants": {
       "B": {
-        "total": 12,
+        "total": 50,
         "events": {
-          "page_view": 10,
-          "generate_click": 2
+          "page_view": 36,
+          "generate_click": 14
         }
       }
     }
